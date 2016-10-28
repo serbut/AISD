@@ -1,0 +1,37 @@
+//Заявки на переговоры
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+
+
+struct meeting{
+    int begin, end;
+};
+
+bool operator <  (const meeting & a, const meeting & b){
+    return (a.end < b.end);
+}
+
+int count_meetings(std::vector <meeting> input) {
+    int prev_ends = 0, result = 0;
+    for (int i = 0; i < input.size(); i++) {
+        if (input[i].begin >= prev_ends) {
+            prev_ends = input[i].end;
+            result++;
+        }
+    }
+    return result;
+}
+
+int main() {
+    std::vector<meeting> meetings;
+    meeting temp;
+    while(scanf("%d %d", &temp.begin, &temp.end) == 2){
+        meetings.push_back(temp);
+    }
+    std::sort(meetings.begin(), meetings.end());
+    int result = count_meetings(meetings);
+    printf("%d", result);
+    return 0;
+}

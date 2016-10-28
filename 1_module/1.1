@@ -1,0 +1,23 @@
+//Поиск нулей факториала
+#include <cstdio>
+using  namespace std;
+
+int count_of_zero(int input){
+    int check = 5, result = 0;
+    for(int i = 5; i <= input; i+=5){
+        while(i % check == 0) {
+            result++;
+            check*=5;
+        }
+        check = 5;
+    }
+    return result;
+}
+
+int main()
+{
+    int input;
+    scanf("%d", &input);
+    printf("%d", count_of_zero(input));
+    return 0;
+}

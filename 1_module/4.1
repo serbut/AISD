@@ -1,0 +1,74 @@
+//Очередь с динамическим буфером
+#include <cstdio>
+#include <cstring>
+
+struct Queue {
+    Queue(int size) {
+        buf_size = size;
+        buffer = new int[buf_size];
+        head = 0;
+        tail = 0;
+    };
+    int pop() {
+        if (head == tail)
+            return -1;
+        else {
+            int result = buffer[head];
+            head = (head + 1) % buf_size;
+            return result;
+        }
+    }
+    void push(int num) {
+        if ((tail + 1) % buf_size == head) {
+            int * temp = new int[buf_size * 2];
+            for (int i = 0; i < buf_size - 1; i++) {
+                if (head + i < buf_size) {
+                    temp[i] = buffer[head + i];
+                }
+                else {
+                    temp[i] = buffer[i - buf_size + head];
+                }
+            }
+            delete[] buffer;
+            head = 0;
+            tail = buf_size - 1;
+            buffer = temp;
+            buf_size *= 2;
+            buffer[tail] = num;
+            tail = (tail + 1) % buf_size;
+        }
+        else {
+            buffer[tail] = num;
+            tail = (tail + 1) % buf_size;
+        }
+    }
+    ~Queue() {
+        delete[] buffer;
+    }
+private:
+    int buf_size;
+    int * buffer;
+    int head;
+    int tail;
+};
+
+int main() {
+    Queue q(50);
+    int input_count, operation, number;
+    scanf("%d", &input_count);
+    for (int i = 0; i < input_count; i++) {
+        scanf("%d %d", &operation, &number);
+        if (operation == 3) {
+            q.push(number);
+        }
+        else if (operation == 2) {
+            if (q.pop() != number) {
+                printf("NO");
+                break;
+            }
+        }
+        if (i == input_count - 1)
+            printf("YES");
+    }
+    return 0;
+}

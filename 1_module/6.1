@@ -1,0 +1,39 @@
+//Высокая пирамида
+#include <cstdio>
+
+long long count_pyramids(int n) {
+    long long matr[n][n], matr_count[n][n]; //создаем две матрицы n*n, в ячейках одной храним количество пирамид для данного основания и количества кубиков,
+    // в другой - общее количество пирамид, которое можно построить из данного количества кубиков
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) {
+            matr[i][j] = 0; //заполняем матрицы нулями
+            matr_count[i][j] = 0;
+        }
+    for (int osn = 0; osn <= n; osn++) { //идем по строкам матриц (номер строки равен длине основания пирамиды минус 1)
+        for (int n_count = osn;
+            n_count < n; n_count++) { //идем по столбцам (столбец равен количеству кубиков в пирамиде минус 1)
+            if (osn == 0) {   //если основание равно 1 (первая строка) то записываем 1 в обе матрицы
+                matr[osn][n_count] = 1;
+                matr_count[osn][n_count] = 1;
+            } else if (osn == n_count) { //если основание равно количеству кубиков (диагональ матрицы)
+                matr[osn][n_count] = 1; // то записываем 1 в первую матрицу
+                matr_count[osn][n_count] = 1 + matr_count[osn - 1][n_count]; // а во вторую - количество пирамид для предыдущего основания плюс 1
+            } else {
+                if(n_count - osn - 1 < osn) //если количество кубиков после записи основания меньше самого основания
+                    matr[osn][n_count] = matr_count[n_count - osn - 1][n_count - osn - 1]; //берем значение с диагонали второй матрицы
+                else
+                    matr[osn][n_count] = matr_count[osn][n_count - osn - 1]; //иначе берем значение из второй матрицы для нашего основания
+                matr_count[osn][n_count] = matr_count[osn - 1][n_count] + matr[osn][n_count]; //общее количество равно сумме пирамид для предыдущего основания и для текущего
+            }
+        }
+    }
+    return matr_count[n - 1][n - 1];
+}
+
+int main() {
+    int n = 0;
+    scanf("%d", &n);
+    long long result = count_pyramids(n);
+    printf("%lld", result);
+    return 0;
+}

@@ -1,0 +1,32 @@
+//Пересечение множеств
+nclude <cstdio>
+#include <cstring>
+
+void find_intersection(int * arr_1, int * arr_2, int size_1, int size_2) {
+    int pos_1 = 0, pos_2 = 0;
+    while (pos_1 < size_1 && pos_2 < size_2){
+        if(arr_1[pos_1] == arr_2[pos_2]){
+            printf("%d ", arr_1[pos_1]);
+            pos_1++;
+            pos_2++;
+        }
+        else if(arr_1[pos_1] < arr_2[pos_2])
+            pos_1++;
+        else
+            pos_2++;
+
+    }
+}
+
+int main() {
+    int size_1, size_2;
+    scanf("%d \n %d", &size_1, &size_2);
+    int arr_1[size_1], arr_2[size_2];
+    for (int i = 0; i < size_1; i++)
+        scanf("%d", &arr_1[i]);
+    for (int i = 0; i < size_2; i++)
+        scanf("%d", &arr_2[i]);
+    find_intersection(arr_1, arr_2, size_1, size_2);
+    return 0;
+}
+

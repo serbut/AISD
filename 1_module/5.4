@@ -1,0 +1,172 @@
+//Вычисление выражение (постфиксная запись)
+#include <cstdio>
+#include <cstring>
+struct Stack {
+    Stack(int size) {
+        stack_size = size;
+        top = -1;
+        buffer = new char[stack_size];
+    }
+    void push(char sym) {
+        if (top - 1 < stack_size) {
+            buffer[++top] = sym;
+        }
+        else {
+            char * temp = new char[stack_size * 2];
+            for (int i = 0; i < stack_size - 1; i++)
+                temp[i] = buffer[i];
+            delete[] buffer;
+            stack_size *= 2;
+            buffer = temp;
+            buffer[++top] = sym;
+        }
+    }
+    char pop() {
+        if (top != -1)
+            return buffer[top--];
+    }
+    char get_top() {
+        if (top != -1)
+            return buffer[top];
+    }
+    bool is_empty() {
+        return top == -1;
+    }
+    ~Stack() {
+        delete[] buffer;
+    }
+private:
+    char * buffer;
+    int top;
+    int stack_size;
+};
+
+struct Stack_numbers {
+    Stack_numbers(int size) {
+        stack_size = size;
+        top = -1;
+        buffer = new int[stack_size];
+    }
+    void push(int number) {
+        if (top - 1 < stack_size) {
+            buffer[++top] = number;
+        }
+        else {
+            int * temp = new int[stack_size * 2];
+            for (int i = 0; i < stack_size - 1; i++)
+                temp[i] = buffer[i];
+            delete[] buffer;
+            stack_size *= 2;
+            buffer = temp;
+            buffer[++top] = number;
+        }
+    }
+    int pop() {
+        if (top != -1)
+            return buffer[top--];
+    }
+    bool is_empty() {
+        return top == -1;
+    }
+    ~Stack_numbers() {
+        delete[] buffer;
+    }
+private:
+    int * buffer;
+    int top;
+    int stack_size;
+};
+
+int priority(int operation) {
+    if (operation == '+' || operation == '-')
+        return 1;
+    if (operation == '*' || operation == '/')
+        return 2;
+    if (operation == '(')
+        return 3;
+}
+
+char * to_postfix() {
+    char * input_buf = new char[200];
+    Stack operations(100);
+    char sym;
+    int pos = 0;
+    bool prev_is_digit = false;
+    scanf("%c", &sym);
+    while (sym != '\n') {
+        if (sym >= '0' && sym <= '9') {
+            input_buf[pos++] = sym;
+            prev_is_digit = true;
+        }
+        else if (sym == '+' || sym == '-' || sym == '*' || sym == '/') {
+            if (prev_is_digit)
+                input_buf[pos++] = ' ';
+            if ((operations.is_empty() || operations.get_top() == '(') || (priority(sym) > priority(operations.get_top()))) {
+                operations.push(sym);
+            }
+            else {
+                while (!operations.is_empty() && (operations.get_top() != '(' || priority(operations.get_top()) < priority(sym))) {
+                    input_buf[pos++] = operations.pop();
+                }
+                operations.push(sym);
+            }
+            prev_is_digit = false;
+        }
+        else if (sym == '(') {
+            if (prev_is_digit)
+                input_buf[pos++] = ' ';
+            operations.push(sym);
+            prev_is_digit = false;
+        }
+        else if (sym == ')') {
+            if (prev_is_digit)
+                input_buf[pos++] = ' ';
+            while (operations.get_top() != '(') {
+                input_buf[pos++] = operations.pop();
+            }
+            operations.pop();
+            prev_is_digit = false;
+        }
+        scanf("%c", &sym);
+    }
+    while (!operations.is_empty()) {
+        input_buf[pos++] = operations.pop();
+    }
+    input_buf[pos] = '\0';
+    return input_buf;
+}
+int calculate_postfix(char * input) {
+    Stack_numbers numbers(100);
+    int pos = 0;
+    while (input[pos] != '\0') {
+        if (input[pos] >= '0' && input[pos] <= '9') {
+            int num = input[pos++] - '0';
+           while (input[pos] >= '0' && input[pos] <= '9') {
+                num = num * 10 + (input[pos++] - '0');
+          }
+            numbers.push(num);
+        }
+
+        else if (input[pos] == '+' || input[pos] == '-' || input[pos] == '*' || input[pos] == '/') {
+            int b = numbers.pop(), a = numbers.pop();
+            if (input[pos] == '+')
+                numbers.push(a + b);
+            else if (input[pos] == '-')
+                numbers.push(a - b);
+            else if (input[pos] == '*')
+                numbers.push(a * b);
+            else if (input[pos] == '/')
+                numbers.push(a / b);
+            pos++;
+        } else
+            pos++;
+    }
+    return numbers.pop();
+}
+
+int main() {
+    char * postfix = to_postfix();
+    printf("%d", calculate_postfix(postfix));
+    return 0;
+}
+
